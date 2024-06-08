@@ -1,16 +1,13 @@
 ﻿using FC.ClickVende.Data.Interfaces;
 using FC.ClickVende.Data.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FC.ClickVende.Data.Repositories
 {
     public class ClientRepository : IClientRepository
     {
-        private List<Client> _clients = new();
+        private List<Client> _clients = new List<Client>();
 
         public void Add(Client client)
         {
@@ -19,12 +16,12 @@ namespace FC.ClickVende.Data.Repositories
 
         public Client GetById(Guid id)
         {
-            var client = _clients.FirstOrDefault(client => client.Id == id);
-            return client;
+            return _clients.FirstOrDefault(c => c.Id == id);
         }
+
         public List<Client> GetClients()
         {
-            return _clients.ToList();
+            return new List<Client>(_clients);
         }
 
         public Client Update(Client clientUpdated)
@@ -44,7 +41,7 @@ namespace FC.ClickVende.Data.Repositories
 
         public void Delete(Guid id)
         {
-            _clients.RemoveAll(client => client.Id == id);
+            _clients.RemoveAll(c => c.Id == id);
         }
     }
 }

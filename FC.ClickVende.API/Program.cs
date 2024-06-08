@@ -18,26 +18,31 @@ namespace FC.ClickVende.API
             builder.Services.AddSingleton<IClientRepository, ClientRepository>();
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Configuração do Swagger/OpenAPI para ajudar na documentação e teste da API.
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configuração da pipeline de requisições HTTP.
             if (app.Environment.IsDevelopment())
             {
+                // Ativa o Swagger apenas em desenvolvimento para a documentação da API.
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
+            // Aplica redirecionamento HTTP para HTTPS automaticamente.
             app.UseHttpsRedirection();
 
+            // Ativa o middleware de autorização.
             app.UseAuthorization();
 
-
+            // Mapeia os controladores para serem acessíveis como endpoints da API.
             app.MapControllers();
 
+            // Inicia a aplicação.
             app.Run();
         }
     }

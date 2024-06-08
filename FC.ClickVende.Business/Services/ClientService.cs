@@ -12,15 +12,11 @@ namespace FC.ClickVende.Business.Services
 {
     public class ClientService : IClientService
     {
-        #region Atributos de Classe
-        private readonly ClientRepository _repository;
+        private readonly IClientRepository _repository;
 
-        #endregion
-
-        #region Construtor
-        public ClientService()
+        public ClientService(IClientRepository repository)
         {
-            _repository = new ClientRepository();
+            _repository = repository;
         }
 
         #endregion
@@ -39,7 +35,7 @@ namespace FC.ClickVende.Business.Services
         public ClientDTO GetClientById(Guid id)
         {
             var client = _repository.GetById(id);
-            if (client is null)
+            if (client == null)
             {
                 return null;
             }
@@ -52,10 +48,16 @@ namespace FC.ClickVende.Business.Services
         public List<ClientDTO> GetClients()
         {
             var clients = _repository.GetClients();
-            if (clients is null)
+            return clients.Select(client => new ClientDTO
             {
-                return null;
-            }
+                Id = client.Id,
+                Name = client.Name,
+                CPF = client.CPF,
+                Address = client.Address,
+                PhoneNumber = client.PhoneNumber,
+                Email = client.Email
+            }).ToList();
+        }
 
             return clients.Select(client => ToDTO(client)).ToList();
         }
@@ -88,7 +90,7 @@ namespace FC.ClickVende.Business.Services
                 Id = clientDTO.Id,
                 Name = clientDTO.Name,
                 CPF = clientDTO.CPF,
-                Adress = clientDTO.Adress,
+                Address = clientDTO.Address,
                 PhoneNumber = clientDTO.PhoneNumber,
                 Email = clientDTO.Email
             };

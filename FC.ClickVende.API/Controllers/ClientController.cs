@@ -2,6 +2,7 @@
 using FC.ClickVende.Business.Interfaces;
 using FC.ClickVende.Business.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace FC.ClickVende.API.Controllers
 {
@@ -31,20 +32,20 @@ namespace FC.ClickVende.API.Controllers
         public IActionResult GetClient(Guid id)
         {
             var clientDTO = _clientService.GetClientById(id);
-            if (clientDTO is null)
+            if (clientDTO == null)
             {
-                return NotFound();
+                return NotFound($"Client with id {id} not found.");
             }
             return Ok(clientDTO);
         }
 
-        [HttpGet("GetClientList")]
+        [HttpGet]
         public IActionResult GetClientList()
         {
             var clients = _clientService.GetClients();
-            if (clients is null)
+            if (clients == null || clients.Count == 0)
             {
-                return NotFound();
+                return NotFound("No clients found.");
             }
             return Ok(clients);
         }
@@ -52,8 +53,13 @@ namespace FC.ClickVende.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
+            var client = _clientService.GetClientById(id);
+            if (client == null)
+            {
+                return NotFound($"Client with id {id} not found.");
+            }
             _clientService.DeleteClient(id);
-            return Ok();
+            return Ok("Client deleted successfully.");
         }
 
         [HttpPut("{id}")]
@@ -63,7 +69,7 @@ namespace FC.ClickVende.API.Controllers
             var retorno = _clientService.UpdateClient(clientDTO);
             if(retorno is null)
             {
-                return NotFound();
+                return NotFound($"Client with id {clientDto.Id} not found.");
             }
             return Ok(retorno);
         }
