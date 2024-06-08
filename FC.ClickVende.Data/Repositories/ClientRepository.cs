@@ -1,15 +1,12 @@
 ﻿using FC.ClickVende.Data.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FC.ClickVende.Data.Repositories
 {
-    public class ClientRepository
+    public class ClientRepository : IClientRepository
     {
-        private List<Client> _clients = new();
+        private List<Client> _clients = new List<Client>();
 
         public void Add(Client client)
         {
@@ -18,26 +15,32 @@ namespace FC.ClickVende.Data.Repositories
 
         public Client GetById(int id)
         {
-            var client = _clients.FirstOrDefault(client => client.Id == id);
-            return client;
-        }
-        public List<Client> GetClients()
-        {
-            return _clients.ToList();
+            return _clients.FirstOrDefault(c => c.Id == id);
         }
 
-        public void Update(Client clientUpdated)
+        public List<Client> GetClients()
         {
-            var index = _clients.FindIndex(client => client.Id == clientUpdated.Id);
-            if (index != -1)
+            return new List<Client>(_clients);
+        }
+
+        public void Update(Client clientToUpdate)
+        {
+            var client = _clients.FirstOrDefault(c => c.Id == clientToUpdate.Id);
+            if (client != null)
             {
-                _clients[index] = clientUpdated;
+                // Atualiza os campos do objeto. A lista já contém uma referência a este objeto,
+                // então não é necessário reinserir o objeto na lista.
+                client.Name = clientToUpdate.Name;
+                client.CPF = clientToUpdate.CPF;
+                client.Address = clientToUpdate.Address;
+                client.PhoneNumber = clientToUpdate.PhoneSource;
+                client.Email = clientToUpdate.Email;
             }
         }
 
         public void Delete(int id)
         {
-            _clients.RemoveAll(client => client.Id == id);
+            _clients.RemoveAll(c => c.Id == id);
         }
     }
 }
