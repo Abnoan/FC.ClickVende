@@ -1,4 +1,5 @@
-﻿using FC.ClickVende.Data.Models;
+﻿using FC.ClickVende.Data.Interfaces;
+using FC.ClickVende.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FC.ClickVende.Data.Repositories
 {
-    public class ClientRepository
+    public class ClientRepository : IClientRepository
     {
         private List<Client> _clients = new();
 
@@ -16,7 +17,7 @@ namespace FC.ClickVende.Data.Repositories
             _clients.Add(client);
         }
 
-        public Client GetById(int id)
+        public Client GetById(Guid id)
         {
             var client = _clients.FirstOrDefault(client => client.Id == id);
             return client;
@@ -26,16 +27,22 @@ namespace FC.ClickVende.Data.Repositories
             return _clients.ToList();
         }
 
-        public void Update(Client clientUpdated)
+        public Client Update(Client clientUpdated)
         {
-            var index = _clients.FindIndex(client => client.Id == clientUpdated.Id);
-            if (index != -1)
+            var client = _clients.FirstOrDefault(client => client.Id == clientUpdated.Id);
+            if (client != null)
             {
-                _clients[index] = clientUpdated;
+                client.Adress = clientUpdated.Adress;
+                client.PhoneNumber = clientUpdated.PhoneNumber;
+                client.CPF = clientUpdated.CPF;
+                client.Email = clientUpdated.Email;
+                client.Name = clientUpdated.Name;
             }
+
+            return client;
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             _clients.RemoveAll(client => client.Id == id);
         }

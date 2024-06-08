@@ -1,4 +1,5 @@
 ﻿using FC.ClickVende.Business.DTOs;
+using FC.ClickVende.Business.Interfaces;
 using FC.ClickVende.Data.Models;
 using FC.ClickVende.Data.Repositories;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FC.ClickVende.Business.Services
 {
-    public class ClientService
+    public class ClientService : IClientService
     {
         #region Atributos de Classe
         private readonly ClientRepository _repository;
@@ -25,39 +26,25 @@ namespace FC.ClickVende.Business.Services
         #endregion
 
         #region Public Methods
-        public void CreateClient(ClientDTO clientDTO)
+        public ClientDTO CreateClient(ClientDTO clientDTO)
         {
-            var client = new Client
-            {
-                Id = clientDTO.Id,
-                Name = clientDTO.Name,
-                CPF = clientDTO.CPF,
-                Adress = clientDTO.Adress,
-                PhoneNumber = clientDTO.PhoneNumber,
-                Email = clientDTO.Email
-            };
+            var client = ToClient(clientDTO);
+            client.Id = Guid.NewGuid();
 
             _repository.Add(client);
+            clientDTO.Id = client.Id;
+            return clientDTO;
         }
 
-        public ClientDTO GetClientById(int id)
+        public ClientDTO GetClientById(Guid id)
         {
-            CreateMockClient();
             var client = _repository.GetById(id);
             if (client is null)
             {
                 return null;
             }
 
-            var clientDTO = new ClientDTO()
-            {
-                Id = client.Id,
-                Name = client.Name,
-                CPF = client.CPF,
-                Adress = client.Adress,
-                PhoneNumber = client.PhoneNumber,
-                Email = client.Email
-            };
+            ClientDTO clientDTO = ToDTO(client);
 
             return clientDTO;
         }
@@ -70,19 +57,33 @@ namespace FC.ClickVende.Business.Services
                 return null;
             }
 
-            return ListToModel(clients);
+            return clients.Select(client => ToDTO(client)).ToList();
         }
 
-        public void DeleteClient(int id)
+        public ClientDTO UpdateClient(ClientDTO clientDTO)
         {
-            CreateMockClient();
+            Client client = ToClient(clientDTO);
+
+            if (_repository.Update(client) is null)
+            {
+                return null;
+            }
+
+            clientDTO = ToDTO(_repository.Update(client));
+            return clientDTO;
+        }
+
+        public void DeleteClient(Guid id)
+        {
             _repository.Delete(id);
         }
 
-        public void UpdateClient(ClientDTO clientDTO)
+        #endregion
+
+        #region Private Methods
+        private Client ToClient(ClientDTO clientDTO)
         {
-            CreateMockClient();
-            var client = new Client
+            return new Client
             {
                 Id = clientDTO.Id,
                 Name = clientDTO.Name,
@@ -91,44 +92,19 @@ namespace FC.ClickVende.Business.Services
                 PhoneNumber = clientDTO.PhoneNumber,
                 Email = clientDTO.Email
             };
-
-            _repository.Update(client);
         }
 
-        #endregion
-
-        #region Private Methods
-        private void CreateMockClient()
+        private ClientDTO ToDTO(Client? client)
         {
-            var clientFake = new ClientDTO()
+            return new ClientDTO()
             {
-                Adress = "rua sete, recife-PE",
-                CPF = "12345678",
-                Email = "Adam@smith.com",
-                Id = 16,
-                Name = "Adam Smith",
-                PhoneNumber = "815555555"
+                Id = client.Id,
+                Name = client.Name,
+                CPF = client.CPF,
+                Adress = client.Adress,
+                PhoneNumber = client.PhoneNumber,
+                Email = client.Email
             };
-            CreateClient(clientFake);
-        }
-        private List<ClientDTO> ListToModel(List<Client> clients)
-        {
-            var listDto = new List<ClientDTO>();
-            foreach (var client in clients)
-            {
-                var clientDTO = new ClientDTO()
-                {
-                    Name = client.Name,
-                    CPF = client.CPF,
-                    Adress = client.Adress,
-                    PhoneNumber = client.PhoneNumber,
-                    Email = client.Email
-                };
-
-                listDto.Add(clientDTO);
-            }
-
-            return listDto;
         }
 
         #endregion

@@ -1,4 +1,5 @@
 ﻿using FC.ClickVende.Business.DTOs;
+using FC.ClickVende.Business.Interfaces;
 using FC.ClickVende.Business.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,21 +9,26 @@ namespace FC.ClickVende.API.Controllers
     [Route("api/clients")]
     public class ClientController : ControllerBase
     {
-        private readonly ClientService _clientService;
-        public ClientController()
+        private readonly IClientService _clientService;
+        public ClientController(IClientService clientService)
         {
-            _clientService = new ClientService();
+            _clientService = clientService;
         }
 
         [HttpPost]
         public IActionResult CreateClient([FromBody] ClientDTO clientDto)
         {
-            _clientService.CreateClient(clientDto);
-            return Ok();
+            if (clientDto == null)
+            {
+                return BadRequest("O DTO não pode ser null.");
+            }
+
+            var client = _clientService.CreateClient(clientDto);
+            return Ok(client);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetClient(int id)
+        public IActionResult GetClient(Guid id)
         {
             var clientDTO = _clientService.GetClientById(id);
             if (clientDTO is null)
@@ -40,26 +46,26 @@ namespace FC.ClickVende.API.Controllers
             {
                 return NotFound();
             }
-            return Ok();
+            return Ok(clients);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
             _clientService.DeleteClient(id);
             return Ok();
         }
 
-        [HttpPut]
-        public IActionResult UpdateClient([FromBody] ClientDTO clientDTO)
+        [HttpPut("{id}")]
+        public IActionResult UpdateClient([FromRoute] Guid id,[FromBody] ClientDTO clientDTO)
         {
-            if (clientDTO is null)
+            clientDTO.Id = id;
+            var retorno = _clientService.UpdateClient(clientDTO);
+            if(retorno is null)
             {
                 return NotFound();
             }
-            _clientService.UpdateClient(clientDTO);
-
-            return Ok();
+            return Ok(retorno);
         }
     }
 }
