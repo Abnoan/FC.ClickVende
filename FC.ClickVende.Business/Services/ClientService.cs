@@ -1,5 +1,6 @@
 ﻿using FC.ClickVende.Business.DTOs;
 using FC.ClickVende.Business.Interfaces;
+using FC.ClickVende.Data.Interfaces;
 using FC.ClickVende.Data.Models;
 using FC.ClickVende.Data.Repositories;
 using System;
@@ -18,8 +19,6 @@ namespace FC.ClickVende.Business.Services
         {
             _repository = repository;
         }
-
-        #endregion
 
         #region Public Methods
         public ClientDTO CreateClient(ClientDTO clientDTO)
@@ -47,17 +46,7 @@ namespace FC.ClickVende.Business.Services
 
         public List<ClientDTO> GetClients()
         {
-            var clients = _repository.GetClients();
-            return clients.Select(client => new ClientDTO
-            {
-                Id = client.Id,
-                Name = client.Name,
-                CPF = client.CPF,
-                Address = client.Address,
-                PhoneNumber = client.PhoneNumber,
-                Email = client.Email
-            }).ToList();
-        }
+            var clients = _repository.GetClients();        
 
             return clients.Select(client => ToDTO(client)).ToList();
         }
@@ -90,7 +79,7 @@ namespace FC.ClickVende.Business.Services
                 Id = clientDTO.Id,
                 Name = clientDTO.Name,
                 CPF = clientDTO.CPF,
-                Address = clientDTO.Address,
+                Adress = clientDTO.Adress,
                 PhoneNumber = clientDTO.PhoneNumber,
                 Email = clientDTO.Email
             };

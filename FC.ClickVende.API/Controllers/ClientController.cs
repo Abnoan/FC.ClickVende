@@ -69,7 +69,7 @@ namespace FC.ClickVende.API.Controllers
             var retorno = _clientService.UpdateClient(clientDTO);
             if(retorno is null)
             {
-                return NotFound($"Client with id {clientDto.Id} not found.");
+                return NotFound();
             }
             return Ok(retorno);
         }
